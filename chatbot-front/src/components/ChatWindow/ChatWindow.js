@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Box, Paper } from '@mui/material';
-import { Global, css } from '@emotion/react';
+import React, { useEffect } from 'react';
+import { Box } from '@mui/material';
+import { Global } from '@emotion/react';
 
 import Header from '../Header/Header';
 import MessageList from '../MessageList/MessageList';
@@ -13,21 +13,17 @@ import styles from './ChatWindowStyle'
 const ChatWindow = () => {
   const {
     messages,
-    setMessages,
     isLoading,
-    setIsLoading,
     inputValue,
     setInputValue,
-    messagesEndRef,
-    scrollToBottom,
-    handleBotResponse,
-    handleSubmit,
+    handleSubmit
+
   } = useChatWindowLogic();
 
 
- 
 
   return (
+
     <>
       <Global styles={styles.globalStyles} />
       <styles.CustomContainer maxWidth="sm">
@@ -38,7 +34,6 @@ const ChatWindow = () => {
               <MessageList
                 messages={messages}
                 isLoading={isLoading}
-                messagesEndRef={messagesEndRef}
               />
               <InputForm
                 inputValue={inputValue}

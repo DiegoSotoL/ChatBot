@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import axios from 'axios';
 
 export const useChatWindowLogic = () => {
@@ -7,16 +7,8 @@ export const useChatWindowLogic = () => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const messagesEndRef = useRef(null);
-
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollTop = messagesEndRef.current.scrollHeight;
-    }
-  };
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  
+  
 
   const handleBotResponse = (response, predict = '', accuracy = '') => {
     setMessages((prevMessages) => [...prevMessages, { isBot: true, text: response }]);
@@ -44,7 +36,10 @@ export const useChatWindowLogic = () => {
 
         const botResponse = response.data.message;
         const botPredict = response.data.predict;
-        const botAccuracy = response.data.accuracy;
+        const botAccuracy = response.data.acurracy;
+        console.log('botResponse'+botResponse)
+        console.log('botPredict'+botPredict)
+        console.log('botAccuracy'+botAccuracy)
         handleBotResponse(botResponse, botPredict, botAccuracy);
       } catch (error) {
         console.error('Error al obtener respuesta del chatbot:', error);
@@ -62,11 +57,8 @@ export const useChatWindowLogic = () => {
     setMessages,
     isLoading,
     setIsLoading,
-    inputValue,
     setInputValue,
-    messagesEndRef,
-    scrollToBottom,
-    handleBotResponse,
     handleSubmit,
+    inputValue
   };
 };
