@@ -1,12 +1,19 @@
 import React from 'react';
-import styles from './HeaderStyle'
+import { AppBar, Toolbar, IconButton, Typography } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 
-
-const Header = () => {
+const Header = ({ onMenuButtonClick }) => {
   return (
-    <styles.CustomTypographyTitle variant="h4" component="h1" align="center" gutterBottom>
-      Chatbot
-    </styles.CustomTypographyTitle>
+    <AppBar position="static">
+      <Toolbar>
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          ChatBot
+        </Typography>
+        <IconButton edge="end" color="inherit" aria-label="menu" onClick={onMenuButtonClick}>
+          <MenuIcon />
+        </IconButton>
+      </Toolbar>
+    </AppBar>
   );
 };
 

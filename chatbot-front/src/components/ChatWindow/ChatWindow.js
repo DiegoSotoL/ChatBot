@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Box } from '@mui/material';
 import { Global } from '@emotion/react';
 
@@ -16,29 +16,34 @@ const ChatWindow = () => {
     isLoading,
     inputValue,
     setInputValue,
-    handleSubmit
-
+    handleSubmit,
+    addMenuButtons,
+    callApi,
   } = useChatWindowLogic();
 
 
 
-  return (
+  const handleApiCall = async () => {
+    await callApi(inputValue);
+  };
 
+  return (
     <>
       <Global styles={styles.globalStyles} />
       <styles.CustomContainer maxWidth="sm">
         <styles.CenterBox>
           <Box my={4}>
-            <Header />
+            <Header onMenuButtonClick={() => addMenuButtons('mainMenu')} />
             <styles.CustomPaper elevation={3}>
-              <MessageList
-                messages={messages}
-                isLoading={isLoading}
-              />
+              <MessageList messages={messages} isLoading={isLoading} onButtonClick={handleSubmit} />
               <InputForm
                 inputValue={inputValue}
                 setInputValue={setInputValue}
-                handleSubmit={handleSubmit}
+                handleSubmit={() => {
+                  if (inputValue.trim()) {
+                    handleSubmit(inputValue);
+                  }
+                }}
               />
             </styles.CustomPaper>
           </Box>

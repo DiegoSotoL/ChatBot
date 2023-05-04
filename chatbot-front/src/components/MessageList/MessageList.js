@@ -1,10 +1,42 @@
-import React, { useEffect, useRef } from 'react';
-import { Box, CircularProgress } from '@mui/material';
+import React, { useEffect, useRef,useState } from 'react';
+import { Box, CircularProgress, Button } from '@mui/material';
 import Message from '../Message/Message';
-
-const MessageList = ({ messages, isLoading }) => {
+import MenuButtons from '../MenuButtons/MenuButtons';
+import {menus} from '../../constantes'
+const MessageList = ({ messages, isLoading, onButtonClick, showMenuButtons }) => {
   const messagesEndRef = useRef(null);
+  const [currentMenu, setCurrentMenu] = useState('mainMenu');
 
+  
+
+  const renderMessageOrButton = (message, index) => {
+    if (message.isButton) {
+      return (
+        <Box key={index} display="flex" flexDirection="column">
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => onButtonClick(message.text)}
+            style={{ marginTop: 10 }}
+          >
+            {message.text}
+          </Button>
+        </Box>
+      );
+    } else {
+      return <Message key={index} message={message.text} isBot={message.isBot} />;
+    }
+  };
+  const handleButtonClick = (buttonText) => {
+    const foundMenu = Object.entries(menus).find(([key, value]) => value.includes(buttonText));
+  
+    if (foundMenu) {
+      setCurrentMenu(foundMenu[0]);
+    } else {
+      onButtonClick(buttonText);
+    }
+  };
+  
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -12,17 +44,22 @@ const MessageList = ({ messages, isLoading }) => {
   }, [messages]);
 
   return (
-    <Box p={2} minHeight="60vh" maxHeight="60vh" overflow="auto">
-      {messages.map((message, index) => (
-        <Message key={index} message={message.text} isBot={message.isBot} />
-      ))}
-      {isLoading && (
-        <Box display="flex" justifyContent="center">
-          <CircularProgress />
-        </Box>
+    <>
+      {showMenuButtons && (
+        <Box width="100%">
+        <MenuButtons menu={currentMenu} onButtonClick={handleButtonClick} />
+      </Box>
       )}
-      <span ref={messagesEndRef}></span>
-    </Box>
+      <Box p={2} minHeight="60vh" maxHeight="60vh" overflow="auto">
+        {messages.map(renderMessageOrButton)}
+        {isLoading && (
+          <Box display="flex" justifyContent="center">
+            <CircularProgress />
+          </Box>
+        )}
+        <span ref={messagesEndRef}></span>
+      </Box>
+    </>
   );
 };
 
