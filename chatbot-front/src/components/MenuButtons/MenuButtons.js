@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Box } from '@mui/material';
-import { menus } from '../../constantes';
+import { menus } from '../MenuButtons/MenuButtonsLogic';
 
 const MenuButtons = ({ menu, onButtonClick }) => {
   

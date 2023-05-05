@@ -18,14 +18,10 @@ const ChatWindow = () => {
     setInputValue,
     handleSubmit,
     addMenuButtons,
-    callApi,
+    handleButtonClick
   } = useChatWindowLogic();
 
 
-
-  const handleApiCall = async () => {
-    await callApi(inputValue);
-  };
 
   return (
     <>
@@ -35,7 +31,7 @@ const ChatWindow = () => {
           <Box my={4}>
             <Header onMenuButtonClick={() => addMenuButtons('mainMenu')} />
             <styles.CustomPaper elevation={3}>
-              <MessageList messages={messages} isLoading={isLoading} onButtonClick={handleSubmit} />
+            <MessageList messages={messages} isLoading={isLoading} onButtonClick={handleButtonClick} />
               <InputForm
                 inputValue={inputValue}
                 setInputValue={setInputValue}

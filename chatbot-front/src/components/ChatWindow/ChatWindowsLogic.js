@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { menus, getNextMenu } from '../../constantes';
+import { menus, getNextMenu } from '../MenuButtons/MenuButtonsLogic';
+import { ACURRACYINTENT } from '../../constants/appConstants';
 
 export const useChatWindowLogic = () => {
   const [messages, setMessages] = useState([
@@ -12,15 +13,48 @@ export const useChatWindowLogic = () => {
   const isMountedRef = useRef(false);
 
   const addMenuButtons = (menuName) => {
-    const foundMenu = Object.entries(menus).find(([key, value]) => key.includes(menuName));
-    const [currentMenuKey, currentMenuValue] = foundMenu;
+    let foundMenu;
+    let nextMenuKey = null;
 
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      ...currentMenuValue.map((item) => ({ isBot: true, isButton: true, text: item })),
-    ]);
+    // Buscar si menuName es una clave en el objeto 'menus'
+    foundMenu = Object.entries(menus).find(([key, value]) => key.toLowerCase().trim() === menuName.toLowerCase().trim());
+
+    // Si no se encuentra como clave, buscar si menuName es un valor en alguno de los menús
+    if (!foundMenu) {
+      const menuNameToFind = menuName.toLowerCase().trim();
+      foundMenu = Object.entries(menus)
+        .map(([key, value]) => [key, value.map(item => item.toLowerCase().trim())])
+        .find(([key, value]) => value.includes(menuNameToFind));
+
+      const [currentMenuKey] = foundMenu;
+      nextMenuKey = getNextMenu(menuNameToFind, currentMenuKey);
+
+        if (nextMenuKey) {// si aun nos e ha llegado alfinal del mapeo de un flujo
+          foundMenu = Object.entries(menus).find(([key, value]) => key.toLowerCase().trim() === nextMenuKey.toLowerCase().trim());
+
+        } else {
+          setMessages((prevMessages) => [...prevMessages, { isBot: true, text: 'FINAAAAL: ' + menuNameToFind }]);
+        }
+    }
+
+    // Si se encontró el menú
+    if (foundMenu && (nextMenuKey || menuName === 'mainMenu')) {
+      const [currentMenuKey, currentMenuValue] = foundMenu;
+
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        ...currentMenuValue.map((item) => ({ isBot: true, isButton: true, text: item })),
+      ]);
+    } else {
+      // Manejar el caso en que no se encontró el menú
+      console.error('No se encontró el menú con el nombre proporcionado.');
+    }
   };
-
+  const handleButtonClick = (buttonText) => {
+    // Aquí puedes llamar a addMenuButtons o manejar el flujo del menú como prefieras
+    addMenuButtons(buttonText);
+  };
+  
   useEffect(() => {
     const runEffect = () => {
       if (isMountedRef.current) {
@@ -33,30 +67,40 @@ export const useChatWindowLogic = () => {
     runEffect();
   }, [currentMenu]);
 
-  const handleBotResponse = (response, predict = '', accuracy = '') => {
-    setMessages((prevMessages) => [...prevMessages, { isBot: true, text: response }]);
-    if (predict) {
-      setMessages((prevMessages) => [...prevMessages, { isBot: true, text: 'Intent: ' + predict }]);
+  const handleBotResponse = (predict = '', accuracy = '') => {
+
+    if (accuracy > ACURRACYINTENT) {
+      addMenuButtons(predict)
+
+    } else {
+      if (predict) {
+        setMessages((prevMessages) => [...prevMessages, { isBot: true, text: 'Intent: ' + predict }]);
+      }
+      if (accuracy) {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { isBot: true, text: 'Accuracy: ' + accuracy },
+        ]);
+      }
     }
-    if (accuracy) {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { isBot: true, text: 'Accuracy: ' + accuracy },
-      ]);
-    }
+
   };
 
   const handleSubmit = async (messageText) => {
     if (messageText.trim()) {
-      const foundMenu = Object.entries(menus).find(([key, value]) => value.includes(messageText));
+      const menuNameToFind = messageText.toLowerCase().trim();
+      let foundMenu;
+      foundMenu = Object.entries(menus)
+        .map(([key, value]) => [key, value.map(item => item.toLowerCase().trim())])
+        .find(([key, value]) => value.includes(menuNameToFind));
 
       if (foundMenu) {
-        const [currentMenuKey, currentMenuValue] = foundMenu;
+        const [currentMenuKey] = foundMenu;
         const nextMenuKey = getNextMenu(messageText, currentMenuKey);
 
         if (nextMenuKey) {// si aun nos e ha llegado alfinal del mapeo de un flujo
           setCurrentMenu(nextMenuKey);
-        }else{
+        } else {
           setMessages((prevMessages) => [...prevMessages, { isBot: true, text: 'FINAAAAL: ' + messageText }]);
         }
       }
@@ -72,11 +116,11 @@ export const useChatWindowLogic = () => {
           message: inputValue,
         });
 
-        const botResponse = response.data.message;
+
         const botPredict = response.data.predict;
         const botAccuracy = response.data.acurracy;
 
-        handleBotResponse(botResponse, botPredict, botAccuracy);
+        handleBotResponse(botPredict, botAccuracy);
       } catch (error) {
         console.error('Error al obtener respuesta del chatbot:', error);
         handleBotResponse(
@@ -97,5 +141,6 @@ export const useChatWindowLogic = () => {
     setInputValue,
     handleSubmit,
     inputValue,
+    handleButtonClick 
   };
 };

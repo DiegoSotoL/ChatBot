@@ -1,0 +1,1 @@
+export const ACURRACYINTENT = 60; //si el intent es mayor al 60% de acurracy, lo considera

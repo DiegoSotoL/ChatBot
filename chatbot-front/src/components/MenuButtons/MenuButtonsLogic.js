@@ -42,7 +42,7 @@ export function getNextMenu(messageText, currentMenuKey) {
     };
 
     const currentMenuOptions = menus[currentMenuKey];
-    const selectedOption = currentMenuOptions.find(option => option === messageText);
+    const selectedOption = currentMenuOptions.find(option => option.toLowerCase().trim() === messageText.toLowerCase().trim());
 
     if (selectedOption) {
         let response = nextMenuMapping[currentMenuKey][selectedOption];

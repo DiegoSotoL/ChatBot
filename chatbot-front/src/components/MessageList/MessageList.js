@@ -2,7 +2,7 @@ import React, { useEffect, useRef,useState } from 'react';
 import { Box, CircularProgress, Button } from '@mui/material';
 import Message from '../Message/Message';
 import MenuButtons from '../MenuButtons/MenuButtons';
-import {menus} from '../../constantes'
+import { menus } from '../MenuButtons/MenuButtonsLogic';
 const MessageList = ({ messages, isLoading, onButtonClick, showMenuButtons }) => {
   const messagesEndRef = useRef(null);
   const [currentMenu, setCurrentMenu] = useState('mainMenu');

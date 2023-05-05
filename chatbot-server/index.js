@@ -34,10 +34,8 @@ app.post('/respuesta', async (req, res) => {
 
   // Por ahora, solo devolveremos un mensaje de prueba y opciones.
   res.send({
-    message: `Recibí tu mensaje: ${message}`,
     predict : response.predict ,
     acurracy : response.acurracy ,
-    options: ['Opción 1', 'Opción 2', 'Opción 3'],
   });
 });
 
